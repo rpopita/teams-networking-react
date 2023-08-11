@@ -1,3 +1,6 @@
+import React from "react";
+import { loadTeamsRequest } from "./middleware";
+
 type Team = {
   id: string;
   promotion: string;
@@ -104,50 +107,32 @@ export function TeamsTable(props: Props) {
   );
 }
 
-export function TeamsTableWrapper() {
-  const teams = [
-    {
-      id: "toze8j1610313009673",
-      promotion: "html",
-      members: "Nicolae Matei, HTML",
-      name: "Web Presentation",
-      url: "https://github.com/nmatei/web-intro-presentation",
-      createdBy: "nmatei"
-    },
-    {
-      id: "ezabnf1630345987541",
-      promotion: "css",
-      members: "Nicolae",
-      name: "Names",
-      url: "https://github.com/nmatei/nmatei.github.io",
-      createdBy: "nmatei"
-    },
-    {
-      id: "86mq81630347385708",
-      promotion: "js",
-      members: "Matei, Andrei",
-      name: "JS/HTML/CSS Quiz",
-      url: "https://github.com/nmatei/simple-quiz-app",
-      createdBy: "nmatei"
-    },
-    {
-      id: "w2aal1630347411901",
-      promotion: "js",
-      members: "FastTrackIT Students, Nicolae",
-      name: "Teams Networking",
-      url: "https://github.com/nmatei/teams-networking",
-      createdBy: "nmatei"
-    }
-  ];
-  return (
-    <>
-      <TeamsTable loading={true} teams={[]} />
-      <br />
-      <TeamsTable loading={false} teams={[]} />
-      <br />
-      <TeamsTable loading={true} teams={teams} />
-      <br />
-      <TeamsTable loading={false} teams={teams} />
-    </>
-  );
+type WrapperProps = {};
+
+type State = {
+  loading: boolean;
+  teams: Team[];
+};
+
+export class TeamsTableWrapper extends React.Component<WrapperProps, State> {
+  constructor(props) {
+    super(props);
+    this.state = {
+      loading: true,
+      teams: []
+    };
+  }
+
+  async componentDidMount() {
+    const teams = await loadTeamsRequest();
+    this.setState({
+      loading: false,
+      teams
+    });
+  }
+
+  render() {
+    console.info("render", this.state.loading);
+    return <TeamsTable loading={this.state.loading} teams={this.state.teams} />;
+  }
 }
